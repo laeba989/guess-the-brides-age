@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Firebase Scripts for Modular SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <!-- Firebase Scripts for Non-Module SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,31 +95,31 @@
             <label for="name">Your Name:</label>
             <input type="text" id="name" name="name" required><br><br>
             <div class="image-container">
-                <img src="https://raw.githubusercontent.com/laeba989/guess-the-brides-age/main/pic.jpg.JPG?raw=true" alt="Bride at Age X">
+                <img src="https://github.com/laeba989/guess-the-brides-age/raw/main/pic.jpg.JPG" alt="Bride at Age X">
                 <br>
                 <label for="guess1">Your Guess:</label>
                 <input type="number" id="guess1" name="guess1" required>
             </div>
             <div class="image-container">
-                <img src="https://raw.githubusercontent.com/laeba989/guess-the-brides-age/main/image2.jpg?raw=true" alt="Bride at Age Y">
+                <img src="https://github.com/laeba989/guess-the-brides-age/raw/main/image2.jpg" alt="Bride at Age Y">
                 <br>
                 <label for="guess2">Your Guess:</label>
                 <input type="number" id="guess2" name="guess2" required>
             </div>
             <div class="image-container">
-                <img src="https://raw.githubusercontent.com/laeba989/guess-the-brides-age/main/image3.jpg?raw=true" alt="Bride at Age Z">
+                <img src="https://github.com/laeba989/guess-the-brides-age/raw/main/image3.jpg" alt="Bride at Age Z">
                 <br>
                 <label for="guess3">Your Guess:</label>
                 <input type="number" id="guess3" name="guess3" required>
             </div>
             <div class="image-container">
-                <img src="https://raw.githubusercontent.com/laeba989/guess-the-brides-age/main/image4.jpg?raw=true" alt="Bride at Age A">
+                <img src="https://github.com/laeba989/guess-the-brides-age/raw/main/image4.jpg" alt="Bride at Age A">
                 <br>
                 <label for="guess4">Your Guess:</label>
                 <input type="number" id="guess4" name="guess4" required>
             </div>
             <div class="image-container">
-                <img src="https://raw.githubusercontent.com/laeba989/guess-the-brides-age/main/image5.jpg?raw=true" alt="Bride at Age B">
+                <img src="https://github.com/laeba989/guess-the-brides-age/raw/main/image5.jpg" alt="Bride at Age B">
                 <br>
                 <label for="guess5">Your Guess:</label>
                 <input type="number" id="guess5" name="guess5" required>
@@ -136,7 +136,7 @@
     <!-- Firebase Initialization Script -->
     <script>
         // Your web app's Firebase configuration
-        const firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyCojWk4MjloXwT7gCM6u7XT5XWPam49Y4Y",
             authDomain: "guessthebridesage.firebaseapp.com",
             projectId: "guessthebridesage",
@@ -148,11 +148,11 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        var db = firebase.firestore();
 
         const correctAnswers = [5, 10, 15, 20, 25]; // Update with correct ages
 
-        document.getElementById('guessForm').addEventListener('submit', async function(event) {
+        document.getElementById('guessForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
             const name = document.getElementById('name').value;
@@ -164,22 +164,20 @@
                 parseInt(document.getElementById('guess5').value),
             ];
 
-            try {
-                await db.collection("guesses").add({
-                    name: name,
-                    guesses: guesses,
-                    timestamp: new Date()
-                });
+            db.collection("guesses").add({
+                name: name,
+                guesses: guesses,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
                 alert("Your guesses have been submitted!");
                 document.getElementById('guessForm').reset();
-            } catch (error) {
+            }).catch((error) => {
                 console.error("Error adding document: ", error);
-            }
+            });
         });
 
-        async function calculateWinners() {
-            try {
-                const querySnapshot = await db.collection("guesses").get();
+        function calculateWinners() {
+            db.collection("guesses").get().then((querySnapshot) => {
                 let participants = [];
                 querySnapshot.forEach((doc) => {
                     let data = doc.data();
@@ -195,9 +193,9 @@
                 });
                 document.getElementById('winner').innerHTML = resultHtml;
                 document.querySelector('.result').style.display = 'block';
-            } catch (error) {
+            }).catch((error) => {
                 console.error("Error calculating winners: ", error);
-            }
+            });
         }
 
         // Uncomment the line below to calculate winners when the page loads
